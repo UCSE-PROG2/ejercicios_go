@@ -1,3 +1,4 @@
+
 # CRUD de Aviones - API REST en Go
 
 ## Objetivo
@@ -114,43 +115,57 @@ import (
     "crud_aviones/utils"
 )
 
-var aviones = make(map[string]dto.AvionRequest)
+type Avion struct {
+    ID     string
+    Avion  dto.AvionRequest
+}
+
+var aviones []Avion
 
 func CreateAvion(avion dto.AvionRequest) (dto.AvionResponse, error) {
     id := generateID()
-    aviones[id] = avion
+    nuevoAvion := Avion{
+        ID:    id,
+        Avion: avion,
+    }
+    aviones = append(aviones, nuevoAvion)
     return utils.ConvertToResponse(avion, id), nil
 }
 
 func GetAvionByID(id string) (dto.AvionResponse, error) {
-    avion, exists := aviones[id]
-    if !exists {
-        return dto.AvionResponse{}, errors.New("avión no encontrado")
+    for _, avion := range aviones {
+        if avion.ID == id {
+            return utils.ConvertToResponse(avion.Avion, id), nil
+        }
     }
-    return utils.ConvertToResponse(avion, id), nil
+    return dto.AvionResponse{}, errors.New("avión no encontrado")
 }
 
 func UpdateAvion(id string, avion dto.AvionRequest) (dto.AvionResponse, error) {
-    if _, exists := aviones[id]; !exists {
-        return dto.AvionResponse{}, errors.New("avión no encontrado")
+    for i, avionItem := range aviones {
+        if avionItem.ID == id {
+            aviones[i].Avion = avion
+            return utils.ConvertToResponse(avion, id), nil
+        }
     }
-    aviones[id] = avion
-    return utils.ConvertToResponse(avion, id), nil
+    return dto.AvionResponse{}, errors.New("avión no encontrado")
 }
 
 func DeleteAvion(id string) error {
-    if _, exists := aviones[id]; !exists {
-        return errors.New("avión no encontrado")
+    for i, avion := range aviones {
+        if avion.ID == id {
+            aviones = append(aviones[:i], aviones[i+1:]...)
+            return nil
+        }
     }
-    delete(aviones, id)
-    return nil
+    return errors.New("avión no encontrado")
 }
 
 func SearchAviones(search dto.SearchRequest) []dto.AvionResponse {
     var results []dto.AvionResponse
     
-    for id, avion := range aviones {
-        response := utils.ConvertToResponse(avion, id)
+    for _, avion := range aviones {
+        response := utils.ConvertToResponse(avion.Avion, avion.ID)
         if utils.MatchesSearch(response, search) {
             results = append(results, response)
         }

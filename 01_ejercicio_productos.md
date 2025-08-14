@@ -1,10 +1,10 @@
 # CRUD de Productos - API REST en Go
 
 ## Objetivo
-Crear una API REST en Go para gestionar productos con operaciones CRUD completas.
+Crear una API REST en Go para gestionar productos con operaciones CRUD completas y conexión a base de datos MongoDB.
 
 ## Entidad Producto
-- **id**: identificador único
+- **id**: identificador único (ObjectID de MongoDB)
 - **nombre**: nombre del producto
 - **descripcion**: descripción del producto
 - **precio**: precio del producto
@@ -24,16 +24,36 @@ Crear una API REST en Go para gestionar productos con operaciones CRUD completas
 
 ## Arquitectura
 ```
-├── main.go          # Rutas
+├── main.go          # Rutas y configuración
 ├── handlers/        # Funciones que atienden rutas
 ├── services/        # Lógica de negocio
+├── repositories/    # Acceso a base de datos
+├── model/          # Estructuras de datos
 ├── dto/            # Structs de request/response
+├── database/       # Configuración de base de datos
 ├── utils/          # Funciones generales
 ```
 
-## Estructuras Anidadas (DTOs)
+## Base de Datos
+- **MongoDB**: Base de datos NoSQL
+- **Conexión**: mongodb://localhost:27017
+- **Base de datos**: ejemplo
+- **Colección**: productos
 
-### Definición de structs anidados
+## Estructuras de Datos
+
+### Modelo de Producto
+```go
+type Producto struct {
+    ID          primitive.ObjectID `bson:"_id,omitempty"`
+    Nombre      string             `bson:"nombre"`
+    Descripcion string             `bson:"descripcion"`
+    Precio      float64            `bson:"precio"`
+    Categoria   Categoria          `bson:"categoria"`
+}
+```
+
+### DTOs para Request/Response
 ```go
 type Categoria struct {
     ID          string `json:"id"`
@@ -71,4 +91,4 @@ producto.Categoria.Nombre = "Nueva Categoría"
 ```
 
 ## Resultado
-Al completar este ejercicio tendrás una API REST completa para gestionar productos con todas las operaciones CRUD implementadas, incluyendo el manejo de categorías como estructuras anidadas.
+Al completar este ejercicio tendrás una API REST completa para gestionar productos con todas las operaciones CRUD implementadas, incluyendo el manejo de categorías como estructuras anidadas y persistencia en MongoDB.
